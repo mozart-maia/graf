@@ -10,6 +10,14 @@ from app.models.graffiti import GraffitiResponse, SurfaceType, GraffitiStatus
 from app.services.spatial import haversine_distance, get_bounding_box
 
 
+def ensure_utc(dt: Optional[datetime]) -> datetime:
+    if dt is None:
+        return datetime.now(timezone.utc)
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
 class GraffitiService:
     def __init__(self, db: Session):
         self.db = db
@@ -44,7 +52,7 @@ class GraffitiService:
         for g in candidates:
             dist = haversine_distance(lat, lon, g.latitude, g.longitude)
             if dist <= radius_meters:
-                is_prot = now < g.protection_until
+                is_prot = now < ensure_utc(g.protection_until)
                 results.append(
                     GraffitiResponse(
                         id=g.id,
@@ -55,9 +63,9 @@ class GraffitiService:
                         longitude=g.longitude,
                         surface_type=SurfaceType(g.surface_type),
                         status=GraffitiStatus(g.status),
-                        created_at=g.created_at,
-                        protection_until=g.protection_until,
-                        expires_at=g.expires_at,
+                        created_at=ensure_utc(g.created_at),
+                        protection_until=ensure_utc(g.protection_until),
+                        expires_at=ensure_utc(g.expires_at),
                         is_protected=is_prot,
                         distance_meters=round(dist, 2),
                     )
@@ -135,8 +143,9 @@ class GraffitiService:
                 break
 
         if existing_spot:
-            if now < existing_spot.protection_until:
-                diff_seconds = (existing_spot.protection_until - now).total_seconds()
+            existing_prot = ensure_utc(existing_spot.protection_until)
+            if now < existing_prot:
+                diff_seconds = (existing_prot - now).total_seconds()
                 hours_left = max(0.1, round(diff_seconds / 3600.0, 1))
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
@@ -190,9 +199,9 @@ class GraffitiService:
             longitude=new_graffiti.longitude,
             surface_type=SurfaceType(new_graffiti.surface_type),
             status=GraffitiStatus(new_graffiti.status),
-            created_at=new_graffiti.created_at,
-            protection_until=new_graffiti.protection_until,
-            expires_at=new_graffiti.expires_at,
+            created_at=ensure_utc(new_graffiti.created_at),
+            protection_until=ensure_utc(new_graffiti.protection_until),
+            expires_at=ensure_utc(new_graffiti.expires_at),
             is_protected=True,
             distance_meters=0.0,
         )
@@ -234,3 +243,45 @@ class GraffitiService:
         self.db.commit()
         self.db.refresh(report)
         return report
+
+    def delete_graffiti(self, graffiti_id: str) -> bool:
+        """Deleta um grafite específico e seu arquivo associado."""
+        graffiti = self.db.query(GraffitiModel).filter(GraffitiModel.id == graffiti_id).first()
+        if not graffiti:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Grafite não encontrado.",
+            )
+
+        # Deleta o arquivo físico de upload se existir
+        if graffiti.media_url:
+            filename = os.path.basename(graffiti.media_url)
+            file_path = os.path.join(settings.UPLOAD_DIR, filename)
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    pass
+
+        self.db.delete(graffiti)
+        self.db.commit()
+        return True
+
+    def reset_all_graffitis(self) -> int:
+        """Remove todos os grafites cadastrados e limpa a pasta de uploads (ideal para testes)."""
+        count = self.db.query(GraffitiModel).delete()
+        self.db.query(GraffitiReportModel).delete()
+        self.db.commit()
+
+        # Limpa os arquivos da pasta uploads
+        if os.path.exists(settings.UPLOAD_DIR):
+            for f in os.listdir(settings.UPLOAD_DIR):
+                file_path = os.path.join(settings.UPLOAD_DIR, f)
+                if os.path.isfile(file_path):
+                    try:
+                        os.remove(file_path)
+                    except Exception:
+                        pass
+
+        return count
+

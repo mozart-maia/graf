@@ -74,3 +74,31 @@ def report_graffiti_content(
         graffiti_id=graffiti_id,
         created_at=report.created_at,
     )
+
+
+@router.delete("/reset/all", status_code=status.HTTP_200_OK)
+def reset_all_graffiti_spots(
+    db: Session = Depends(get_db),
+):
+    """
+    [UTILITÁRIO DE TESTES]
+    Remove todos os grafites e fotos da base para permitir pintar novamente no mesmo local.
+    """
+    service = GraffitiService(db)
+    removed_count = service.reset_all_graffitis()
+    return {"message": f"Todos os {removed_count} grafites e mídias foram removidos com sucesso."}
+
+
+@router.delete("/{graffiti_id}", status_code=status.HTTP_200_OK)
+def delete_single_graffiti(
+    graffiti_id: str,
+    db: Session = Depends(get_db),
+):
+    """
+    [UTILITÁRIO DE TESTES]
+    Deleta um grafite específico pelo seu ID.
+    """
+    service = GraffitiService(db)
+    service.delete_graffiti(graffiti_id)
+    return {"message": f"Grafite {graffiti_id} deletado com sucesso."}
+
