@@ -10,7 +10,7 @@
     <!-- Declaração do hardware de Realidade Aumentada (ARCore) -->
     <uses-feature
         android:name="android.hardware.camera.ar"
-        android:required="true" />
+        android:required="false" />
 
     <application
         android:label="AR Graffiti"
@@ -21,7 +21,7 @@
         <!-- Informa ao Google Play Services for AR que o app requer ARCore -->
         <meta-data
             android:name="com.google.ar.core"
-            android:value="required" />
+            android:value="optional" />
 
         <activity
             android:name=".MainActivity"

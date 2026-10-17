@@ -16,10 +16,10 @@ class ARViewScreen extends StatefulWidget {
   final LatLng currentPosition;
 
   const ARViewScreen({
-    Key? key,
+    super.key,
     required this.nearbyGraffitis,
     required this.currentPosition,
-  }) : super(key: key);
+  });
 
   @override
   State<ARViewScreen> createState() => _ARViewScreenState();
@@ -255,7 +255,7 @@ class _ARViewScreenState extends State<ARViewScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.85),
+        color: Colors.black.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white24),
       ),
@@ -299,7 +299,7 @@ class _ARViewScreenState extends State<ARViewScreen> {
 
   Widget _buildBottomCarousel() {
     return Container(
-      color: Colors.black.withOpacity(0.85),
+      color: Colors.black.withValues(alpha: 0.85),
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

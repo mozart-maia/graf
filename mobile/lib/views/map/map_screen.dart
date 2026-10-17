@@ -12,7 +12,7 @@ import '../ar/ar_view.dart';
 import '../claim/claim_view.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({Key? key}) : super(key: key);
+  const MapScreen({super.key});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -116,7 +116,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _applyMockPosition() {
-    final mockPos = LatLng(AppConfig.defaultTestLatitude, AppConfig.defaultTestLongitude);
+    const mockPos = LatLng(AppConfig.defaultTestLatitude, AppConfig.defaultTestLongitude);
     setState(() {
       _currentPosition = mockPos;
       _isUsingSimulatedGps = true;
@@ -213,7 +213,7 @@ class _MapScreenState extends State<MapScreen> {
                     height: 44,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.blueAccent.withOpacity(0.85),
+                        color: Colors.blueAccent.withValues(alpha: 0.85),
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 3),
                         boxShadow: const [
@@ -249,7 +249,7 @@ class _MapScreenState extends State<MapScreen> {
                         ),
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ],
@@ -266,7 +266,7 @@ class _MapScreenState extends State<MapScreen> {
                 decoration: BoxDecoration(
                   color: Colors.black87,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.purpleAccent.withOpacity(0.5)),
+                  border: Border.all(color: Colors.purpleAccent.withValues(alpha: 0.5)),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,

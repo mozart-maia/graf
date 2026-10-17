@@ -8,7 +8,7 @@ import '../../services/api_service.dart';
 class ClaimScreen extends StatefulWidget {
   final LatLng currentPosition;
 
-  const ClaimScreen({Key? key, required this.currentPosition}) : super(key: key);
+  const ClaimScreen({super.key, required this.currentPosition});
 
   @override
   State<ClaimScreen> createState() => _ClaimScreenState();
@@ -90,9 +90,9 @@ class _ClaimScreenState extends State<ClaimScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.deepPurple.withOpacity(0.08),
+                color: Colors.deepPurple.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.deepPurple.withOpacity(0.2)),
+                border: Border.all(color: Colors.deepPurple.withValues(alpha: 0.2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +127,7 @@ class _ClaimScreenState extends State<ClaimScreen> {
             ),
             const SizedBox(height: 6),
             DropdownButtonFormField<SurfaceType>(
-              value: _selectedSurface,
+              initialValue: _selectedSurface,
               decoration: InputDecoration(
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),

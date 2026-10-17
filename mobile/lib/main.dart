@@ -10,7 +10,7 @@ void main() async {
 }
 
 class ARGraffitiApp extends StatelessWidget {
-  const ARGraffitiApp({Key? key}) : super(key: key);
+  const ARGraffitiApp({super.key});
 
   @override
   Widget build(BuildContext context) {
